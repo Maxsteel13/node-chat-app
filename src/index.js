@@ -38,7 +38,7 @@ io.on("connection", (socket) => {
     let errorMsg;
     console.log("send location received", location);
     socket.broadcast.emit(
-      "message",
+      "locationMessage",
       `https://google.com/maps?q=${location.latitude},${location.longitude}`
     );
 

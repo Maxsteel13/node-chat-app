@@ -4,14 +4,32 @@ const btnSend = document.getElementById("btnSend");
 const dvMessageLog = document.getElementById("dvMessageLog");
 const sendLocation = document.getElementById("send-location");
 
+//Templates
+const messageTemplate = document.getElementById("message-template");
+const locationTemplate = document.getElementById("location-template");
+
 const addPara = (message) => {
-  const p = document.createElement("p");
-  p.innerText = message;
-  dvMessageLog.appendChild(p);
+  // const p = document.createElement("p");
+  // p.innerText = message;
+  // dvMessageLog.appendChild(p);
+
+  const html = Mustache.render(messageTemplate.innerHTML, { message });
+  dvMessageLog.insertAdjacentHTML("beforeend", html);
+};
+
+const addLocationPara = (locationUrl) => {
+  const html = Mustache.render(locationTemplate.innerHTML, { locationUrl });
+  console.log("locationUrl", locationUrl);
+  dvMessageLog.insertAdjacentHTML("beforeend", html);
 };
 
 socket.on("message", (message) => {
   addPara(message);
+});
+
+socket.on("locationMessage", (message) => {
+  console.log("locationMessage", message);
+  addLocationPara(message);
 });
 
 btnSend.addEventListener("click", (e) => {
