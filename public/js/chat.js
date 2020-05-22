@@ -3,22 +3,47 @@ const chatInput = document.getElementById("chatInput");
 const btnSend = document.getElementById("btnSend");
 const dvMessageLog = document.getElementById("dvMessageLog");
 const sendLocation = document.getElementById("send-location");
+const sidebar = document.querySelector(".chat__sidebar");
 
 //Templates
 const messageTemplate = document.getElementById("message-template");
 const locationTemplate = document.getElementById("location-template");
+const sidebarTemplate = document.getElementById("sidebar-template");
 
-const addPara = (message) => {
+//Query
+const { username, room } = Qs.parse(location.search, {
+  ignoreQueryPrefix: true,
+});
+
+socket.emit("join", { username, room }, (error) => {
+  if (error) {
+    alert(error);
+    location.href = "/";
+  }
+});
+
+const addPara = (obj) => {
   // const p = document.createElement("p");
   // p.innerText = message;
   // dvMessageLog.appendChild(p);
-
-  const html = Mustache.render(messageTemplate.innerHTML, { message });
+  console.log(obj);
+  const { text: message, createdAt, username } = obj;
+  const html = Mustache.render(messageTemplate.innerHTML, {
+    message,
+    createdAt: moment(createdAt).format("h:mm a"),
+    username,
+  });
   dvMessageLog.insertAdjacentHTML("beforeend", html);
 };
 
-const addLocationPara = (locationUrl) => {
-  const html = Mustache.render(locationTemplate.innerHTML, { locationUrl });
+const addLocationPara = (obj) => {
+  const { url: locationUrl, createdAt, username } = obj;
+
+  const html = Mustache.render(locationTemplate.innerHTML, {
+    locationUrl,
+    createdAt: moment(createdAt).format("h:mm a"),
+    username,
+  });
   console.log("locationUrl", locationUrl);
   dvMessageLog.insertAdjacentHTML("beforeend", html);
 };
@@ -30,6 +55,11 @@ socket.on("message", (message) => {
 socket.on("locationMessage", (message) => {
   console.log("locationMessage", message);
   addLocationPara(message);
+});
+
+socket.on("roomData", (obj) => {
+  const html = Mustache.render(sidebarTemplate.innerHTML, obj);
+  sidebar.innerHTML = html;
 });
 
 btnSend.addEventListener("click", (e) => {
@@ -56,7 +86,11 @@ sendLocation.addEventListener("click", () => {
         { latitude, longitude },
         (errorMsg, message) => {
           if (!errorMsg) {
-            addPara(`Location status: (${message})`);
+            addPara({
+              text: `Location status: (${message})`,
+              createdAt: new Date().getTime(),
+              username: "Admin",
+            });
           }
         }
       );

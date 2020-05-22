@@ -9,11 +9,16 @@
     "express": "^4.17.1",
     "socket.io": "^2.3.0"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "jest": "^26.0.1"
+  },
   "scripts": {
     "start": "node src/index.js",
     "dev": "env-cmd -f config/dev.env nodemon src/index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest --runInBand"
+  },
+  "jest": {
+    "testEnvironment": "node"
   },
   "keywords": [],
   "author": "",
